@@ -1,0 +1,8 @@
+prefix=/home/v7770/Extracirriculars/Robotics/Unstuck-Algorithm/turtlebot_alg_1/install
+
+Name: turtle_one_ctrl
+Description: Description of turtle_one_ctrl
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/v7770/Extracirriculars/Robotics/Unstuck-Algorithm/turtlebot_alg_1/install/lib 
+Requires: 

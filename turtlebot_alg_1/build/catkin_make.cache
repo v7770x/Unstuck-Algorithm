@@ -1,0 +1,2 @@
+turtle_one_ctrl
+-DCATKIN_DEVEL_PREFIX=/home/v7770/Extracirriculars/Robotics/Unstuck-Algorithm/turtlebot_alg_1/devel -DCMAKE_INSTALL_PREFIX=/home/v7770/Extracirriculars/Robotics/Unstuck-Algorithm/turtlebot_alg_1/install -G Unix Makefiles
