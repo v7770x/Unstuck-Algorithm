@@ -1,5 +1,4 @@
 Unstuck algorithm for UW rover.
-q
 
-by Matt Yuen
+by: Vishvam Mazumdar, Matthew Yuen, Fahim Shaihriar
 
