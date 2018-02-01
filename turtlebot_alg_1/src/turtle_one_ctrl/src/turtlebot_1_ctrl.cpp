@@ -14,8 +14,15 @@ void turtleCallback (const nav_msgs::Odometry&msg)
     int x = msg.pose.pose.position.x;
      int y = msg.pose.pose.position.y;
     ROS_INFO("food (%d, %d)", x, y);
+    double x1 = msg.pose.pose.orientation.x;
+    double y1 = msg.pose.pose.orientation.y;
+    double z1 = msg.pose.pose.orientation.z;
+    double w1 = msg.pose.pose.orientation.w;
+
+
+    ROS_INFO("orientation: (%d, %d, %d, %d)", x1, y1, z1, w1);
     geometry_msgs::Twist nextTwist;
-    nextTwist.linear.x= 2;
+    nextTwist.linear.x= 0.1;
     nextTwist.linear.y= 2;
     nextTwist.linear.z= 2;
 
@@ -34,11 +41,14 @@ int main(int a, char ** b)
 
     ros::NodeHandle n;
 
-    pub  = n.advertise<geometry_msgs::Twist>("/mobile_bse/commands/velocity",1);
+    pub  = n.advertise<geometry_msgs::Twist>("/mobile_base/commands/velocity",1);
     sub = n.subscribe("/odom", 1, turtleCallback);
-    ros::AsyncSpinner spinner(1);
-    spinner.start();
-    ros::waitForShutdown();
+    ros::Rate loop_rate(1);
+    while( ros::ok())
+    {
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
 
     return 0;
 
