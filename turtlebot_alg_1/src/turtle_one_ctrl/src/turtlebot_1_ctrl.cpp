@@ -3,6 +3,7 @@
 #include "nav_msgs/Odometry.h"
 #include <tf/transform_datatypes.h>
 #include <cmath>
+#include <std_msgs/String.h>
 using namespace std;
 
 // #include <stdio.h>
@@ -10,8 +11,9 @@ using namespace std;
 // #include <stdlib.h>
 
 ros::Subscriber sub;
-ros::Publisher pub;
-geometry_msgs::Twist prevTwist, originalStuckTwist;
+ros::Publisher pub, statePub;
+nav_msgs::Odometry prevOdom;
+nav_msgs::Odometry originalStuckOdom;
 
 // deque lastTwentySec;
 double initialYaw;
@@ -19,15 +21,18 @@ int cnt = 0;
 int state, subState;
 
 void turtleCallback(const nav_msgs::Odometry&msg);
-void extractRPY(double & r, double & p, double& y, const nav_msgs::Odometry& msg);
-geometry_msgs::Twist sampleTurn (double angle, double yaw, double initialYaw);
+void extractRPY(double & r, double & p, double& y, const nav_msgs::Odometry& msg); // converts the odometry message to roll pitch and yaw
+// void extractPosition()
+void sampleTurn (double angle, double yaw, double initialYaw);
 
 //base functions
 bool checkIfStuck();
 void move(double linSpeed, double angularSpeed);
 bool atDestination(double destination, const nav_msgs::Odometry& currPos); //maybe instead take in the aldready processed x and y coordinates
 bool turned(double targetAngle, const nav_msgs::Odometry& msg); // maybe instead take in yaw; see sample turn for example of how to do it
-void updatePrevTwist(const nav_msgs::Odometry& msg);
+void updatePrevOdom(const nav_msgs::Odometry& msg);
+void updateStateMsg(string message); // to publish a message to the statePub channel
+
 
 
 
@@ -39,7 +44,11 @@ int main(int a, char ** b)
     cnt = 0;
 
     pub  = n.advertise<geometry_msgs::Twist>("/mobile_base/commands/velocity",1);
+    statePub = n.advertise<std_msgs::String>("/unstuck_node/message",1);
+
     sub = n.subscribe("/odom", 1, turtleCallback);
+    state = subState = 0;
+
     ros::Rate loop_rate(60);
     while( ros::ok())
     {
@@ -66,24 +75,23 @@ void turtleCallback (const nav_msgs::Odometry&msg)
 
     //
 
-    // if(checkIfStuck() && state == 0)
-    // {
-    //     state = 1;
-    //     substate = 0;
-    // }else
-    // {
-    //     // publish(unstuck)
-    // }
-    // if(state != 0)
-    // {
-    //     // publish(stuck)
+    if(checkIfStuck() && state == 0)
+    {
+        state = 1;
+        subState = 0;
+    }else
+    {
+        updateStateMsg("unstuck");
+    }
+    if(state != 0)
+    {
+        updateStateMsg("stuck");
         
-    // }
+    }
 
 
-    geometry_msgs::Twist nextTwist = sampleTurn(M_PI/2, yaw, initialYaw);
+    sampleTurn(M_PI/2, yaw, initialYaw);
 
-    pub.publish(nextTwist);
 }
 
 void extractRPY(double & r, double & p, double& y, const nav_msgs::Odometry& msg)
@@ -98,28 +106,56 @@ void extractRPY(double & r, double & p, double& y, const nav_msgs::Odometry& msg
 
 }
 
-geometry_msgs::Twist sampleTurn (double angle, double yaw, double initialYaw)
+void extractPosition(double & x, double & y , double & z, const nav_msgs::Odometry&msg)
 {
-    geometry_msgs::Twist nextTwist;
-    nextTwist.linear.x= 0;
-    nextTwist.linear.y= 0;
-    nextTwist.linear.z= 0;
 
-    // srand(time(NULL));
-    // double ang = rand()%20 *1.0 /10;
 
-    nextTwist.angular.z = 0.2;
-    nextTwist.angular.x = 0;
-    nextTwist.angular.y = 0;
+}
 
+void sampleTurn (double angle, double yaw, double initialYaw)
+{
+    double  ang = 0.2;
     if(fabs( fabs(yaw-initialYaw) - angle) < 1e-1)
     {
         
-        nextTwist.angular.z = 0;
-        nextTwist.linear.x= 0;
-        ROS_INFO("%.2d",fabs(yaw-initialYaw));
+        ang = 0;
         ROS_INFO("Reached!");
-
     }
-    return nextTwist;
+    move(0,ang);
+    // return nextTwist;
 }
+
+void move(double linSpeed, double angularSpeed)
+{
+    geometry_msgs::Twist nextTwist;
+    nextTwist.linear.x= linSpeed;
+    nextTwist.linear.y= 0;
+    nextTwist.linear.z= 0;
+
+    nextTwist.angular.z = angularSpeed;
+    nextTwist.angular.x = 0;
+    nextTwist.angular.y = 0;
+
+    pub.publish(nextTwist);
+}
+
+void updatePrevOdom(const nav_msgs::Odometry & currOdom)
+{
+    prevOdom = currOdom;
+}
+
+void updateStateMsg(string msg)
+{
+    
+    std_msgs::String s;
+    s.data = msg;
+    statePub.publish(s);
+    // ROS_INFO("%s",s.data.c_str());
+
+}
+
+bool checkIfStuck()
+{
+    return 0;
+}
+

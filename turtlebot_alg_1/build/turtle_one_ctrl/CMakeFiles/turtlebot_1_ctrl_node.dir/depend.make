@@ -71,6 +71,7 @@ turtle_one_ctrl/CMakeFiles/turtlebot_1_ctrl_node.dir/src/turtlebot_1_ctrl.cpp.o:
 turtle_one_ctrl/CMakeFiles/turtlebot_1_ctrl_node.dir/src/turtlebot_1_ctrl.cpp.o: /opt/ros/kinetic/include/ros/wall_timer_options.h
 turtle_one_ctrl/CMakeFiles/turtlebot_1_ctrl_node.dir/src/turtlebot_1_ctrl.cpp.o: /opt/ros/kinetic/include/rosconsole/macros_generated.h
 turtle_one_ctrl/CMakeFiles/turtlebot_1_ctrl_node.dir/src/turtlebot_1_ctrl.cpp.o: /opt/ros/kinetic/include/std_msgs/Header.h
+turtle_one_ctrl/CMakeFiles/turtlebot_1_ctrl_node.dir/src/turtlebot_1_ctrl.cpp.o: /opt/ros/kinetic/include/std_msgs/String.h
 turtle_one_ctrl/CMakeFiles/turtlebot_1_ctrl_node.dir/src/turtlebot_1_ctrl.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/Matrix3x3.h
 turtle_one_ctrl/CMakeFiles/turtlebot_1_ctrl_node.dir/src/turtlebot_1_ctrl.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/MinMax.h
 turtle_one_ctrl/CMakeFiles/turtlebot_1_ctrl_node.dir/src/turtlebot_1_ctrl.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/QuadWord.h
