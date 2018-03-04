@@ -4,6 +4,9 @@
 #include <tf/transform_datatypes.h>
 #include <cmath>
 #include <std_msgs/String.h>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
 using namespace std;
 
 // #include <stdio.h>
@@ -33,6 +36,12 @@ bool turned(double targetAngle, const nav_msgs::Odometry& msg); // maybe instead
 void updatePrevOdom(const nav_msgs::Odometry& msg);
 void updateStateMsg(string message); // to publish a message to the statePub channel
 
+//algorithm functions & variables
+void algorithmPart1();
+void algorithmPart2();
+void algorithmPart3();
+double alg3Timer;
+int alg3Count;
 
 
 
@@ -48,6 +57,11 @@ int main(int a, char ** b)
 
     sub = n.subscribe("/odom", 1, turtleCallback);
     state = subState = 0;
+
+
+    //alg3 initialization
+    alg3Count = 0;
+    alg3Timer=0;  
 
     ros::Rate loop_rate(60);
     while( ros::ok())
@@ -86,6 +100,19 @@ void turtleCallback (const nav_msgs::Odometry&msg)
     if(state != 0)
     {
         updateStateMsg("stuck");
+        switch(state)
+        {
+            case 1:
+                algorithmPart1();
+                break;
+            case 2:
+                algorithmPart2();
+                break;
+            case 3:
+                algorithmPart3();
+                break;
+
+        }
         
     }
 
@@ -159,3 +186,53 @@ bool checkIfStuck()
     return 0;
 }
 
+void algorithmPart1()
+{
+    return;
+}
+void algorithmPart2()
+{
+    return;
+}
+
+void algorithmPart3()
+{
+    if(checkIfStuck()) //make into !checkIfStuck()
+    {
+        state = 0;
+        subState = 0;
+        return;
+    }
+    switch(subState)
+    {
+        case 0:
+            srand(time(NULL));
+            double randAng= (rand()%1000)/500.0+1;
+            
+            if(alg3Count==0)
+            {
+                alg3Count=1;
+                alg3Timer= clock();
+            }
+            double deltaTime= (clock()-alg3Timer)/(double)CLOCKS_PER_SEC;
+            if( deltaTime>10)
+            {
+                alg3Count =0;
+                alg3Timer=0;
+                subState =1;
+            }
+            else if(alg3Count == 1)
+            {
+                move(0,randAng);
+                if(deltaTime>5)
+                    alg3Count = 2;
+            } else if(alg3Count ==1)
+                move(0,-randAng);
+
+        break;
+
+        
+    }
+    
+    return;
+}

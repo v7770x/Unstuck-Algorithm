@@ -19,6 +19,12 @@ cmath
 -
 std_msgs/String.h
 -
+cstdlib
+-
+ctime
+-
+iostream
+-
 
 /opt/ros/kinetic/include/geometry_msgs/Point.h
 string
