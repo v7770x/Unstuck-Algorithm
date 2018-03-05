@@ -208,6 +208,8 @@ void algorithmPart3()
     {
         state = 0;
         subState = 0;
+        angDenom = 500;
+        linDenom = 5000;
         return;
     }
     switch(subState)
@@ -319,7 +321,7 @@ void algorithmPart3()
                 alg3Count =0;
                 alg3Timer=0;
                 subState =4;
-            }else if(deltaSecs>10)
+            }else if(deltaSecs>50)
             {
                 ROS_INFO("backward");
                 move(-1000/linDenom, 0);  
