@@ -40,7 +40,7 @@ void updateStateMsg(string message); // to publish a message to the statePub cha
 void algorithmPart1();
 void algorithmPart2();
 void algorithmPart3();
-double alg3Timer;
+clock_t alg3Timer;
 int alg3Count;
 
 
@@ -57,6 +57,7 @@ int main(int a, char ** b)
 
     sub = n.subscribe("/odom", 1, turtleCallback);
     state = subState = 0;
+    state =3;
 
 
     //alg3 initialization
@@ -117,7 +118,7 @@ void turtleCallback (const nav_msgs::Odometry&msg)
     }
 
 
-    sampleTurn(M_PI/2, yaw, initialYaw);
+    // sampleTurn(M_PI/2, yaw, initialYaw);
 
 }
 
@@ -206,16 +207,24 @@ void algorithmPart3()
     switch(subState)
     {
         case 0:
+        { 
             srand(time(NULL));
             double randAng= (rand()%1000)/500.0+1;
             
             if(alg3Count==0)
             {
-                alg3Count=1;
+                // alg3Count=1;
+                ROS_INFO("Initial: %d",clock());
                 alg3Timer= clock();
             }
-            double deltaTime= (clock()-alg3Timer)/(double)CLOCKS_PER_SEC;
-            if( deltaTime>10)
+            clock_t deltaTime= (clock()-alg3Timer);
+            float deltaSecs = (float)deltaTime*100/CLOCKS_PER_SEC;
+            if((int)deltaSecs%4>2)
+                alg3Count=2;
+            else
+                alg3Count =1;
+            
+            if( deltaSecs>100)
             {
                 alg3Count =0;
                 alg3Timer=0;
@@ -223,12 +232,22 @@ void algorithmPart3()
             }
             else if(alg3Count == 1)
             {
+                ROS_INFO("right");
                 move(0,randAng);
-                if(deltaTime>5)
-                    alg3Count = 2;
-            } else if(alg3Count ==1)
+                // ROS_INFO("%.3f",deltaSecs);
+            } else if(alg3Count ==2)
+            {
+                ROS_INFO("left");
                 move(0,-randAng);
-
+            }
+        }
+        // case 1:
+        // {
+            
+        // }
+        break;
+        default:
+            state=0;
         break;
 
         
