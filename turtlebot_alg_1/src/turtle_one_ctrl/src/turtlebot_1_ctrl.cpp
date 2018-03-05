@@ -28,8 +28,8 @@ void sampleTurn (double angle, double yaw, double initialYaw);
 //base functions
 bool checkIfStuck();
 void move(double linSpeed, double angularSpeed);
-bool atDestination(double destination, const nav_msgs::Odometry& currPos); //maybe instead take in the aldready processed x and y coordinates
-bool turned(double targetAngle, const nav_msgs::Odometry& msg); // maybe instead take in yaw; see sample turn for example of how to do it
+bool atDestination(double distance, const nav_msgs::Odometry& currPos, double yaw); //maybe instead take in the aldready processed x and y coordinates
+bool turned(double targetAngle, double initYaw, double yaw); //targetAngle should be in degrees, the rest in radians
 void updatePrevOdom(const nav_msgs::Odometry& msg);
 void updateStateMsg(string message); // to publish a message to the statePub channel
 
@@ -83,12 +83,32 @@ void turtleCallback (const nav_msgs::Odometry&msg)
     {
         updateStateMsg("unstuck");
     }
+
     if(state != 0)
     {
         updateStateMsg("stuck");
-        
     }
 
+    //Initialize prevOdom?
+
+    //CASE 1
+    if (state == 1)
+    {
+    	//CASE 1, SUBCASE 0
+    	if (subState == 0)
+    	{
+    		updatePrevOdom(msg);
+
+    		//Move back 5 m
+    		if (atDestination (-5, msg, yaw))
+    			move (0, 0);
+    		else
+    			move (1, 0);
+
+    		//Turn right 45 degrees and move 10 m forward
+
+    	}
+    }
 
     sampleTurn(M_PI/2, yaw, initialYaw);
 
@@ -159,3 +179,29 @@ bool checkIfStuck()
     return 0;
 }
 
+bool atDestination(double distance, const nav_msgs::Odometry& currPos, double yaw)
+{
+    double xCurrent = currPos.pose.pose.position.x;
+    double yCurrent = currPos.pose.pose.position.y;
+    double xPrev = prevOdom.pose.pose.position.x;
+    double yPrev = prevOdom.pose.pose.position.y;
+    double xDest = xPrev + distance*cos(yaw);
+    double yDest = yPrev +distance*sin(yaw);
+
+    if (fabs(xDest - xCurrent) < 1e-1 && fabs(yDest - yCurrent) < 1e-1)
+    {
+    	updatePrevOdom(currPos);
+        return true;
+    }
+    
+    return false;
+}
+
+bool turned(double targetAngle, double initYaw, double yaw)
+{
+	double angle = targetAngle * 180 / M_PI;
+	if (fabs(fabs(yaw-initialYaw)) - angle < 1e-1)
+		return true;
+
+	return false;
+}
