@@ -42,6 +42,7 @@ void algorithmPart2();
 void algorithmPart3();
 clock_t alg3Timer;
 int alg3Count;
+float angDenom, linDenom;
 
 
 
@@ -63,6 +64,8 @@ int main(int a, char ** b)
     //alg3 initialization
     alg3Count = 0;
     alg3Timer=0;  
+    angDenom = 500;
+    linDenom = 5000;
 
     ros::Rate loop_rate(60);
     while( ros::ok())
@@ -89,7 +92,10 @@ void turtleCallback (const nav_msgs::Odometry&msg)
     cnt++;
 
     //
-
+    // if(cnt<200)
+    // move(-0.5,0);
+    // else
+    // move(0.5,0);
     if(checkIfStuck() && state == 0)
     {
         state = 1;
@@ -209,7 +215,7 @@ void algorithmPart3()
         case 0:
         { 
             srand(time(NULL));
-            double randAng= (rand()%1000)/500.0+1;
+            double randAng= (rand()%1000)/angDenom+.5;
             
             if(alg3Count==0)
             {
@@ -224,7 +230,7 @@ void algorithmPart3()
             else
                 alg3Count =1;
             
-            if( deltaSecs>100)
+            if( deltaSecs>10)
             {
                 alg3Count =0;
                 alg3Timer=0;
@@ -240,14 +246,104 @@ void algorithmPart3()
                 ROS_INFO("left");
                 move(0,-randAng);
             }
-        }
-        // case 1:
-        // {
             
-        // }
+        }
+        break;
+        case 1:
+        {
+            srand(time(NULL));
+            double randLin= (rand()%1000)/linDenom+0.05;
+            if(alg3Count==0)
+                alg3Timer= clock();
+            clock_t deltaTime= (clock()-alg3Timer);
+            float deltaSecs = (float)deltaTime*100/CLOCKS_PER_SEC;
+            if((int)deltaSecs%4>2)
+                alg3Count=2;
+            else
+                alg3Count =1;
+            if( deltaSecs>10)
+            {
+                alg3Count =0;
+                alg3Timer=0;
+                subState =2;
+            }
+            else if(alg3Count == 1)
+            {
+                ROS_INFO("forward");
+                move(randLin,0);
+            } else if(alg3Count ==2)
+            {
+                ROS_INFO("backward");
+                move(-randLin,0);
+            }
+        
+        }
+        break;
+        case 2:
+        {
+            srand(time(NULL));
+            double randLin= (rand()%1000)/linDenom-0.1;
+
+            srand(time(NULL));
+            double randAng= (rand()%1000)/angDenom-1;
+            if(alg3Count==0)
+            {
+                alg3Timer= clock();
+                alg3Count++;
+            }
+                
+            clock_t deltaTime= (clock()-alg3Timer);
+            float deltaSecs = (float)deltaTime*100/CLOCKS_PER_SEC;
+            if( deltaSecs>10)
+            {
+                alg3Count =0;
+                alg3Timer=0;
+                subState =3;
+            }
+            ROS_INFO("RandBoth");
+            move(randLin,randAng);
+            
+        }
+        break;
+        case 3:
+        {
+            if(alg3Count==0)
+            {
+                alg3Timer= clock();
+                alg3Count++;
+            }
+            clock_t deltaTime= (clock()-alg3Timer);
+            float deltaSecs = (float)deltaTime*100/CLOCKS_PER_SEC;
+            if( deltaSecs>20)
+            {
+                alg3Count =0;
+                alg3Timer=0;
+                subState =4;
+            }else if(deltaSecs>10)
+            {
+                ROS_INFO("backward");
+                move(-1000/linDenom, 0);  
+            }
+            else
+            {
+                ROS_INFO("forward");
+                move(1000/linDenom,0);    
+            }
+
+        }
+        break;
+        case 4:
+        {
+            linDenom/=1.4;
+            angDenom/=1.4;
+            subState=0;
+        }
         break;
         default:
+        {
             state=0;
+            ROS_INFO("OUT");
+        }
         break;
 
         
