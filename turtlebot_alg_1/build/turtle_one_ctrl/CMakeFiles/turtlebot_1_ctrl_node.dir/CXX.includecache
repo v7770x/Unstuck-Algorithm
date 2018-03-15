@@ -25,6 +25,8 @@ ctime
 -
 iostream
 -
+deque
+-
 
 /opt/ros/kinetic/include/geometry_msgs/Point.h
 string
